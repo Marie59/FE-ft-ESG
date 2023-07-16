@@ -1,0 +1,274 @@
+<tool id="interactive_tool_source_notebook" tool_type="interactive" name="Interactive Source Notebooks" version="0.0.1">
+    <requirements>
+        <!--<container type="docker">quay.io/bgruening/docker-jupyter-notebook:23.03</container>-->
+        <container type="docker">docker.io/library/source-jupyterhub</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="Source Interactive Tool" requires_domain="True">
+            <port>8888</port>
+            <url>ipython/lab</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="REMOTE_HOST">$__galaxy_url__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DISABLE_AUTH">true</environment_variable>
+        <environment_variable name="API_KEY" inject="api_key" />
+    </environment_variables>
+    <configfiles>
+        <inputs name="inputs" filename="galaxy_inputs.json" data_style="staging_path_and_source_path"/>
+        <configfile name="staging_script" filename="staging_script.py"><![CDATA[
+import json, os, shutil
+import os.path
+galaxy_inputs = "galaxy_inputs.json"
+galaxy_inputs_raw = "galaxy_inputs_raw.json"
+base_staging_path = "jupyter"
+base_data_staging_path = "galaxy_inputs"
+data_staging_path = os.path.join(base_staging_path, base_data_staging_path)
+os.makedirs(data_staging_path, exist_ok=True)
+shutil.copyfile(galaxy_inputs, os.path.join(data_staging_path, galaxy_inputs_raw))
+galaxy_input_dict = {}
+for user_input in json.load(open(galaxy_inputs, "r")).get("user_inputs", []):
+    input_values = user_input['input_type']['input_value']
+    input_name = user_input["input_name"]
+    assert input_name not in galaxy_input_dict, ValueError("Each name can only be used once, but a duplicate was found: %s" % (input_name))
+    if 'dataset' in user_input['input_type']['input_type_selector']:
+        input_values2 = []
+        if not isinstance(input_values, list):
+            input_values = [input_values]
+        for input_value_dict in input_values:
+            path, filename = os.path.split(input_value_dict['staging_path'])
+            input_value_dict2 = {"path": os.path.join(base_data_staging_path, input_name, path, filename), "metadata_files": []}
+            path = os.path.join(data_staging_path, input_name, path)
+            os.makedirs(path, exist_ok=True)
+            try:
+                os.symlink(input_value_dict['source_path'], os.path.join(path, filename))
+            except FileExistsError:
+                pass
+            for metadata_value_dict in input_value_dict['metadata_files']:
+                path, filename = os.path.split(metadata_value_dict['staging_path'])
+                input_value_dict2["metadata_files"].append(os.path.join(base_data_staging_path, input_name, path, filename))
+                path = os.path.join(data_staging_path, input_name, path)
+                os.makedirs(path, exist_ok=True)
+                try:
+                    os.symlink(metadata_value_dict['source_path'], os.path.join(path, filename))
+                except FileExistsError:
+                    pass
+            input_values2.append(input_value_dict2)
+        input_values = input_values2
+    galaxy_input_dict[input_name] = input_values
+with open(os.path.join(data_staging_path, galaxy_inputs), "w") as fh:
+    json.dump(galaxy_input_dict, fh)
+]]>
+        </configfile>
+        <configfile name="galaxy_input_startup_script"><![CDATA[
+import json, os
+from galaxy_ie_helpers import get
+from galaxy_ie_helpers import put
+from galaxy_ie_helpers import get_galaxy_connection
+HISTORY_ID = os.environ.get('HISTORY_ID', None)
+try:
+    GALAXY_INPUTS = json.load(open(os.path.join(os.environ.get("GALAXY_WORKING_DIR", ""), "jupyter", "galaxy_inputs", "galaxy_inputs.json")))
+except FileNotFoundError:
+    GALAXY_INPUTS = {}
+        ]]>
+    </configfile>
+    </configfiles>
+    <command detect_errors="aggressive"><![CDATA[
+        python staging_script.py &&
+        export GALAXY_WORKING_DIR=`pwd` &&
+        mkdir -p ./jupyter/outputs/ &&
+        mkdir -p ./jupyter/data &&
+        mkdir -p ./jupyter/notebooks &&
+
+        ## change into the directory where the notebooks are located
+        cd ./jupyter/ &&
+        export HOME=/home/jovyan/ &&
+        export PATH=/home/jovyan/.local/bin:\$PATH &&
+        cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
+        #set $output_notebook_name = 'jupyterlab_notebook.ipynb'
+        
+        #if $mode.mode_select == 'scratch'
+            ## copy all notebooks, workflows and data
+            ## cp -r '$__tool_directory__/default_notebook.ipynb' ./notebooks &&
+            cp -r /home/\$NB_USER/notebooks/ ./notebooks &&
+
+            ## provide all rights to copied files
+            jupyter lab --allow-root --no-browser &&
+            cp ./*.ipynb '$jupyter_notebook'
+            jupyter lab --no-browser --NotebookApp.shutdown_button=True
+        #else
+            #import re
+            #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
+            #if not $cleaned_name.endswith(".ipynb"'$jupyter_notebook'):
+                #set $cleaned_name = "%s.ipynb" % $cleaned_name
+            #end if
+            cp '$mode.ipynb' '${cleaned_name}' &&
+            jupyter trust '${cleaned_name}' &&
+            #if $mode.run_it:
+                jupyter nbconvert --to notebook --execute --output '${output_notebook_name}' --allow-errors '${cleaned_name}' &&
+                cp '${output_notebook_name}' '$jupyter_notebook'
+            #else:
+                #set $output_notebook_name = $cleaned_name
+                jupyter lab --no-browser --NotebookApp.shutdown_button=True
+            #end if
+        #end if
+    ]]>
+    </command>
+     <inputs>
+        <conditional name="mode">
+            <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
+                <option value="scratch">Start with a fresh notebook</option>
+                <option value="previous">Load a previous notebook</option>
+            </param>
+            <when value="scratch"/>
+            <when value="previous">
+                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook"/>
+                <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one."
+                    help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
+            </when>
+        </conditional>
+         <repeat name="user_inputs" title="User inputs">
+            <param name="input_name" type="text" value="" label="Name for parameter" optional="False" help="Required. ASCII letters and numbers only.">
+                <validator type="empty_field" message="Name is required"/>
+                <sanitizer>
+                    <valid initial="string.ascii_letters,string.digits"/>
+                </sanitizer>
+            </param>
+            <param name="description" type="text" label="Additional optional description" optional="true"/>
+            <conditional name="input_type">
+                <param name="input_type_selector" type="select" label="Choose the input type">
+                    <option value="dataset" selected="true">Dataset</option>
+                    <option value="dataset_multiple">Multiple datasets</option>
+                    <option value="dataset_collection">Dataset collection</option>
+                    <option value="dataset_collection_list">Dataset collection (list)</option>
+                    <option value="dataset_collection_paired">Dataset collection (paired)</option>
+                    <option value="dataset_collection_list_paired">Dataset collection (list:paired)</option>
+                    <option value="text">Text</option>
+                    <option value="integer">Integer</option>
+                    <option value="float">Floating point</option>
+                    <option value="boolean">Boolean</option>
+                    <option value="color">Color selector</option>
+                    <option value="dataset_optional" selected="true">Optional Dataset</option>
+                    <option value="dataset_multiple_optional">Optional Multiple datasets</option>
+                    <option value="dataset_collection_optional">Optional Dataset collection</option>
+                    <option value="dataset_collection_list_optional">Optional Dataset collection (list)</option>
+                    <option value="dataset_collection_paired_optional">Optional Dataset collection (paired)</option>
+                    <option value="dataset_collection_list_paired_optional">Optional Dataset collection (list:paired)</option>
+                    <option value="text_optional">Optional Text</option>
+                    <option value="integer_optional">Optional Integer</option>
+                    <option value="float_optional">Optional Floating point</option>
+                    <option value="boolean_optional">Optional Boolean</option>
+                    <option value="color_optional">Optional Color selector</option>
+                </param>
+                <when value="dataset">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="false" optional="false"/>
+                </when>
+                <when value="dataset_multiple">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="true" optional="false"/>
+                </when>
+                <when value="dataset_collection">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" optional="false"/>
+                </when>
+                <when value="dataset_collection_list">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list" optional="false"/>
+                </when>
+                <when value="dataset_collection_paired">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="paired" optional="false"/>
+                </when>
+                <when value="dataset_collection_list_paired">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list:paired" optional="false"/>
+                </when>
+                <when value="text">
+                    <param name="input_value" type="text" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="integer">
+                    <param name="input_value" type="integer" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="float">
+                    <param name="input_value" type="float" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="boolean">
+                    <param name="input_value" type="boolean" truevalue="true" falsevalue="false" label="Select value" optional="false"/>
+                </when>
+                <when value="color">
+                    <param name="input_value" type="color" label="Select value" optional="false"/>
+                </when>
+                <when value="dataset_optional">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="false" optional="true"/>
+                </when>
+                <when value="dataset_multiple_optional">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="true" optional="true"/>
+                </when>
+                <when value="dataset_collection_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" optional="true"/>
+                </when>
+                <when value="dataset_collection_list_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list" optional="true"/>
+                </when>
+                <when value="dataset_collection_paired_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="paired" optional="true"/>
+                </when>
+                <when value="dataset_collection_list_paired_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list:paired" optional="true"/>
+                </when>
+                <when value="text_optional">
+                    <param name="input_value" type="text" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="integer_optional">
+                    <param name="input_value" type="integer" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="float_optional">
+                    <param name="input_value" type="float" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="boolean_optional">
+                    <param name="input_value" type="boolean" truevalue="true" falsevalue="false" label="Select value" optional="true"/>
+                </when>
+                <when value="color_optional">
+                    <param name="input_value" type="color" label="Select value" optional="true"/>
+                </when>
+            </conditional>
+        </repeat>
+    </inputs>
+    <outputs>
+        <data name="jupyter_notebook" format="ipynb" label="Executed GPU SOURCE Notebook"/>
+        <collection name="output_collection" type="list" label="GPU SOURCE notebook output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="false"/>
+        </collection>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+            <param name="mode" value="previous" />
+            <param name="ipynb" value="test.ipynb" />
+            <param name="run_it" value="true" />
+            <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+
+
+SOURCE
+
+Why such notebooks?
+-------------------
+
+The package Sea Observations Utility for Reprocessing, Calibration and Evaluation (SOURCE) is a Python 3.x package which has been developed within the framework of RITMARE project (http://www.ritmare.it) by the oceanography team in Istituto Nazionale di Geofisica e Vulcanologia INGV (http://www.ingv.it).
+
+SOURCE aims to manage jobs with in situ observations and model data from Ocean General Circulation Models (OGCMs) in order to:
+
+Assess the quality of sea observations using original quality flags and reprocessing the data using global range check, spike removal, stuck value test and recursive statistic quality check;
+return optimized daily and hourly time series of specific EOV (Essential Ocean Variables);
+extract and aggregate in time model data at specific locations and depths;
+evaluate OGCMs accuracy in terms of difference and absolute error.
+SOURCE is written in Python, an interpreted programming language highly adopted in the last decade because it is versatile, ease-to-use and fast to develop. SOURCE is developed and maintained as a module and it benefits from Python's open source utilities, such as:
+
+Vectorized numerical data analysis (numPy, sciPy, ObsPy and pandas);
+machine learning tools (scikit-learn);
+hierarchical data storage (netCDF-4) (HDF-5 extension);
+relational metadata storage using Structured Query Language (SQL) as management system.
+SOURCE is relocatable in the sense that it can be adapted to any basin worldwide, provided that the input data follow a specific standard format.
+   ]]></help>
+</tool>
+
