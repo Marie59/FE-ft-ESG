@@ -1,0 +1,73 @@
+{
+  "data": {
+    "end_date": "2022-12-05T12:42:27.164470",
+    "id": "0eea9b1b-f86b-4770-bd52-a8d357a21459",
+    "params": {
+      "calc_perf": true,
+      "calc_state": true,
+      "calc_traj": true,
+      "climate_gee_dataset": null,
+      "crs": "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]",
+      "geojsons": [
+      {
+        "coordinates": [
+          [
+            [
+              13.964423978715217,
+              41.05113677188558
+            ],
+            [
+              14.256165592381366,
+              41.05113677188558
+            ],
+            [
+              14.256165592381366,
+              41.27243920670921
+            ],
+            [
+              13.964423978715217,
+              41.27243920670921
+            ],
+            [
+              13.964423978715217,
+              41.05113677188558
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    ],
+      "local_context": {
+        "area_of_interest_name": "te-galaxy-test",
+        "base_dir": "/home/giuliano/trends_earth_data"
+      },
+      "ndvi_gee_dataset": "users/geflanddegradation/toolbox_datasets/ndvi_modis_2001_2021",
+      "prod_mode": "TrendsEarth-LPD-5",
+      "prod_perf_year_final": 2015,
+      "prod_perf_year_initial": 2001,
+      "prod_state_year_bl_end": 2012,
+      "prod_state_year_bl_start": 2001,
+      "prod_state_year_tg_end": 2015,
+      "prod_state_year_tg_start": 2013,
+      "prod_traj_year_final": 2015,
+      "prod_traj_year_initial": 2001,
+      "task_name": "",
+      "task_notes": "",
+      "trajectory_method": "ndvi_trend"
+    },
+    "progress": 0,
+    "results": {},
+    "script_id": "47b99c3d-f5b5-4df3-81e7-324a17a6e147",
+    "script": {
+        "description": "Calculate all three SDG 15.3.1 sub-indicators in one step",
+        "id": "47b99c3d-f5b5-4df3-81e7-324a17a6e147",
+        "name": "sdg-15-3-1-sub-indicators",
+        "name_readable": "SDG 15.3.1 sub-indicators",
+        "run_mode": "remote",
+        "version": "2.1"
+    },
+    "start_date": "2022-12-05T12:42:27.164465",
+    "status": "PENDING",
+    "user_id": "a1d45524-7dbc-4e36-801b-5f9b70f6dc77"
+  }
+}

@@ -1,0 +1,72 @@
+<tool id="te_productivity" name="Trends earth productivity" version="2.1.14" profile = "22.01">
+    <description>calculation for the 1.5.1 SDG indicator.</description>
+    <requirements>
+        <requirement type="package" version="1.24.3">numpy</requirement>
+        <requirement type="package" version="2.1.14">trends_earth_schemas</requirement>
+        <requirement type="package" version="2.1.14">trends_earth_algorithms</requirement>
+        <requirement type="package" version="0.1.353">earthengine-api</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        python
+            '$__tool_directory__/te_productivity.py'
+            '$input_data'
+            '$__tool_directory__/key.json'
+        ]]>
+    </command>
+    <inputs>
+        <param name="input_data" type="data" format="json" label="Input a json file"/>
+    </inputs>
+    <outputs>
+        <data name="output_geojson" from_work_dir="productivity.json" format="json" label="Productivity"/>
+    </outputs>
+    <tests>
+        <test expect_num_outputs="1">
+            <param name="input_data" value="sample_raw_job.json"/>
+            <output name="output_geojson">
+                <assert_contents>
+                    <has_text text="E6P"/>
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+=======================
+Productivity indicator
+=======================
+
+
+**What it does**
+
+
+
+**Input description**
+
+One input file in json format.
+
++----------------+
+|      Json      |
++================+
+|    Json file   |
++----------------+
+|       ...      |
++----------------+
+
+
+**Output**
+
+-Json file
+
+
+
+    ]]>    </help>
+        <citations>
+            <citation type="bibtex">
+            @Manual{,
+            title = {Trends.Earth},
+            author = { Yengoh Genesis, Lennart Olsson, Mariano Gonzalez-Roglich, Monica Noon, Tristan Schnader, Anna Tengberg, and Alex Zvoleff},
+            year = {2022},
+            url = {http://trends.earth},
+            }
+            </citation>   
+        </citations>
+</tool>
