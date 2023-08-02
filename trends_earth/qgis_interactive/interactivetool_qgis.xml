@@ -13,9 +13,9 @@
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        mkdir -p /root/Documents/QGIS/data/output &&
-        ln -s  /root/Documents/QGIS/data/output/ ./output &&
-        cp '$infile' '/root/Documents/QGIS/data/$infile.display_name' &&
+        export HOME=\$PWD &&
+        mkdir -p ./output &&
+        cp '$infile' './$infile.display_name' &&
         /init
     ]]>
     </command>
