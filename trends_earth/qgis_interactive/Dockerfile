@@ -19,6 +19,7 @@ RUN chmod +x /startapp.sh && \
 
 # Set the name of the application.
 ENV APP_NAME="QGIS"
+ENV APP_VERSION="3.32"
 
 ENV KEEP_APP_RUNNING=0
 
@@ -30,19 +31,12 @@ ENV PATH ${PATH}:${JAVA_HOME}/bin
 WORKDIR /app/qgis
 
 USER root
-RUN apt-get update && apt-get install -y gnupg software-properties-common
 
 # Install required packages for X11 and QGIS
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    x11-apps \
-    qgis qgis-plugin-grass
-
-# Set the DISPLAY environment variable to point to the X11 server on the host (not working for now)
-#ENV DISPLAY=host.docker.internal:0
-
-# Share the X11 socket with the container (same here)
-#VOLUME /tmp/.X11-unix:/tmp/.X11-unix
+RUN DEBIAN_FRONTEND=noninteractive apt update && apt install wget gnupg -y && \
+    wget -O - https://qgis.org/downloads/qgis-2022.gpg.key | gpg --import && \
+    gpg --export --armor D155B8E6A419C5BE | apt-key add - && \
+    apt-get update && apt-get install -y qgis qgis-plugin-grass && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /config
-
