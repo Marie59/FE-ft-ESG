@@ -1,22 +1,22 @@
 <tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@">
     <description>interactive map for geo-referenced data</description>
     <macros>
-    <token name="@VERSION@">5.6.5</token>
+        <token name="@VERSION@">3.32</token>
     </macros>
     <requirements>
-        <container type="docker">docker.io/library/qgis_docker</container>
+        <container type="docker">quay.io/galaxy/qgis:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="QGIS on $infile.display_name" requires_domain="True">
-            <port>80</port>
+            <port>5800</port>
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-    	ln -s  /root/Documents/QGIS/data/output/ ./output/ &&
         mkdir -p /root/Documents/QGIS/data/output &&
+        ln -s  /root/Documents/QGIS/data/output/ ./output/ &&
         cp '$infile' '/root/Documents/QGIS/data/$infile.display_name' &&
-        bash /startup.sh      
+        /init
     ]]>
     </command>
     <inputs>
@@ -35,11 +35,13 @@
     </help>
     <citations>
         <citation type="bibtex">
-            @Manual{,
-            title = {Ocean Data View},
-            author = {Schlitzer Reiner},
-            year = {2023},
-            note = {https://odv.awi.de}
+            @Manual{QGIS_software,
+              title = {QGIS Geographic Information System},
+              author = {{QGIS Development Team}},
+              organization = {QGIS Association},
+              year = {%Y},
+              url = {https://www.qgis.org},
+            }
         </citation>
     </citations>
 </tool>
