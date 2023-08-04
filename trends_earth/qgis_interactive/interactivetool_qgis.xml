@@ -1,29 +1,29 @@
-<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@" profile="22.01">
-    <description>interactive geographic information system (GIS)</description>
+<tool id="interactive_tool_qgis" tool_type="interactive" name="QGIS" version="@VERSION@">
+    <description>interactive map for geo-referenced data</description>
     <macros>
-        <token name="@VERSION@">3.32</token>
+    <token name="@VERSION@">5.6.5</token>
     </macros>
     <requirements>
-        <container type="docker">quay.io/galaxy/qgis:@VERSION@</container>
+        <container type="docker">quay.io/opengisch/qgis-server:stable</container>
     </requirements>
     <entry_points>
         <entry_point name="QGIS on $infile.display_name" requires_domain="True">
-            <port>5800</port>
+            <port>80</port>
         </entry_point>
     </entry_points>
     <command detect_errors="exit_code">
     <![CDATA[
-        export HOME=\$PWD &&
-        mkdir -p ./output &&
-        cp '$infile' './$infile.display_name' &&
-        /init
+    	ln -s  /root/Documents/QGIS/data/output/ ./output/ &&
+        mkdir -p /root/Documents/QGIS/data/output &&
+        cp '$infile' '/root/Documents/QGIS/data/$infile.display_name' &&
+        bash /startup.sh      
     ]]>
     </command>
     <inputs>
         <param name="infile" type="data" format="netcdf,h5" label="netcdf"/>
     </inputs>
     <outputs>
-    <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+ 	<data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
         <collection name="outputs" type="list" label="QGIS outputs">
             <discover_datasets pattern="__name_and_ext__" directory="output" />
         </collection>
@@ -35,13 +35,11 @@
     </help>
     <citations>
         <citation type="bibtex">
-            @Manual{QGIS_software,
-              title = {QGIS Geographic Information System},
-              author = {{QGIS Development Team}},
-              organization = {QGIS Association},
-              year = {%Y},
-              url = {https://www.qgis.org},
-            }
+            @Manual{,
+            title = {Ocean Data View},
+            author = {Schlitzer Reiner},
+            year = {2023},
+            note = {https://odv.awi.de}
         </citation>
     </citations>
 </tool>

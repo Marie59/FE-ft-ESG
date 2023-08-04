@@ -7,6 +7,7 @@ RUN apt-get update -y && \
      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
+         unzip \
          libgl1 \
          qt5dxcb-plugin && \
      rm -rf /var/lib/apt/lists/*
@@ -16,7 +17,7 @@ RUN chmod +x /startapp.sh && \
     mkdir -p /app/qgis
 
 # ... (rest of your Dockerfile)
-
+    
 # Set the name of the application.
 ENV APP_NAME="QGIS"
 ENV APP_VERSION="3.32"
@@ -38,5 +39,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt update && apt install wget gnupg -y && \
     gpg --export --armor D155B8E6A419C5BE | apt-key add - && \
     apt-get update && apt-get install -y qgis qgis-plugin-grass && \
     rm -rf /var/lib/apt/lists/*
+
+# Add pluggins to the QGIS tool (just Trends.Earth for now)
+RUN mkdir /home/$NB_USER/plugins
+RUN cd   /home/$NB_USER/plugins; \
+    wget -O trends_earth.zip https://github.com/ConservationInternational/trends.earth/releases/download/v1.0.10/LDMP-1.0.10.zip
+# You can just download here the zip folder for your plugins
 
 WORKDIR /config
