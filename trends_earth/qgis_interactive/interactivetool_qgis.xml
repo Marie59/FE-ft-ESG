@@ -4,7 +4,7 @@
         <token name="@VERSION@">3.32</token>
     </macros>
     <requirements>
-        <container type="docker">docker.io/library/qgis_docker</container>
+        <container type="docker">quay.io/galaxy/qgis:@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="QGIS on Project data" requires_domain="True">
