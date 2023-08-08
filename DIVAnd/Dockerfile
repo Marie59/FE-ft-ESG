@@ -1,13 +1,11 @@
-# build as:
-# sudo docker build  --tag abarth/divand-jupyterhub:$(date --utc +%Y-%m-%dT%H%M)  --tag abarth/divand-jupyterhub:latest .
+# Jupyter container used for Galaxy IPython (+other kernels) Integration
 
-
+# from 5th March 2021
 FROM jupyterhub/singleuser:3.1
 
 MAINTAINER Alexander Barth <a.barth@ulg.ac.be>
 
-EXPOSE 8888
-
+ENV DEBIAN_FRONTEND noninteractive
 USER root
 
 RUN apt-get update
@@ -16,16 +14,21 @@ RUN apt-get install -y ca-certificates curl libnlopt0 make gcc
 RUN apt-get install -y emacs-nox git g++
 
 
+# Set channels to (defaults) > bioconda > conda-forge
+RUN conda config --add channels conda-forge && \
+    conda config --add channels bioconda
+    #conda config --add channels defaults
+
 ENV JUPYTER /opt/conda/bin/jupyter
 ENV PYTHON /opt/conda/bin/python
 ENV LD_LIBRARY_PATH /opt/conda/lib/
 
+    
 RUN conda install -c conda-forge ncurses
 RUN conda install -y ipywidgets
 RUN conda install -y matplotlib
 RUN conda install -c conda-forge jupyterlab-git
 RUN conda install -c conda-forge contourpy 
-RUN conda install -c bioconda galaxy-ie-helpers
 
 RUN wget -O /usr/share/emacs/site-lisp/julia-mode.el https://raw.githubusercontent.com/JuliaEditorSupport/julia-emacs/master/julia-mode.el
 
@@ -43,14 +46,28 @@ ENV JULIA_PACKAGES="CSV DataAssim DIVAnd DataStructures FFTW FileIO Glob HTTP IJ
 
 RUN julia --eval 'using Pkg; Pkg.add(split(ENV["JULIA_PACKAGES"]))'
 
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir bioblend galaxy-ie-helpers
+ADD ./get_notebook.py /get_notebook.py
 
-USER root
-# avoid warning
-# curl: /opt/conda/lib/libcurl.so.4: no version information available (required by curl)
-RUN mv -i /opt/conda/lib/libcurl.so.4 /opt/conda/lib/libcurl.so.4-conda
-RUN rm /opt/julia-1.8.3/bin/../lib/julia/libstdc++.so.6 
-# remove unused kernel
-RUN rm -R /opt/conda/share/jupyter/kernels/python3
+COPY ./ipython-profile.py /home/$NB_USER/.ipython/profile_default/startup/00-load.py
+
+
+RUN pip install jupyterlab_hdf
+    
+# We can get away with just creating this single file and Jupyter will create the rest of the
+# profile for us.
+RUN mkdir -p /home/$NB_USER/.ipython/profile_default/startup/ && \
+    mkdir -p /home/$NB_USER/.jupyter/custom/
+
+COPY ./ipython-profile.py /home/$NB_USER/.ipython/profile_default/startup/00-load.py
+COPY jupyter_notebook_config.py /home/$NB_USER/.jupyter/
+COPY jupyter_lab_config.py /home/$NB_USER/.jupyter/
+
+ADD ./custom.js /home/$NB_USER/.jupyter/custom/custom.js
+ADD ./custom.css /home/$NB_USER/.jupyter/custom/custom.css
+ADD ./default_notebook.ipynb /home/$NB_USER/notebook.ipynb
+
 
 # Download notebooks
 RUN mkdir -p /home/$NB_USER/
@@ -92,9 +109,7 @@ RUN rm -f test.xml Water_body_Salinity.3Danl.nc Water_body_Salinity.4Danl.cdi_im
 RUN julia -e 'using IJulia; IJulia.installkernel("Julia-DIVAnd precompiled", "--sysimage=/home/jovyan/.local/sysimg_DIVAnd.so")'
 RUN julia -e 'using IJulia; IJulia.installkernel("Julia-DIVAnd precompiled, 4 CPUs)", "--sysimage=/home/jovyan/.local/sysimg_DIVAnd.so",env = Dict("JULIA_NUM_THREADS" => "4"))'
 
-#ENV JUPYTER_ENABLE_LAB yes
-
-
+# ENV variables to replace conf file
 ENV DEBUG=false \
     GALAXY_WEB_PORT=10000 \
     NOTEBOOK_PASSWORD=none \
@@ -105,39 +120,39 @@ ENV DEBUG=false \
     REMOTE_HOST=none \
     GALAXY_URL=none
 
+# @jupyterlab/google-drive  not yet supported
+
 USER root
 ADD run_galaxy.sh /usr/local/bin/run_galaxy.sh
 
-COPY ./jupyter_notebook_config.py /home/$NB_USER/.jupyter/
+RUN apt-get -qq update && \
+    apt-get install -y net-tools procps && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN mamba install -c conda-forge jupytext==1.14.1
+# /import will be the universal mount-point for Jupyter
+# The Galaxy instance can copy in data that needs to be present to the Jupyter webserver
+RUN mkdir -p /import/jupyter/outputs/ && \
+    mkdir -p /import/jupyter/data && \
+    mkdir /export/ && \
+    chown -R $NB_USER:users /home/$NB_USER/ /import /export/
 
-USER jovyan
-
-## use 33 (www-data) as nextcloud
-#USER root
-## user id 33 -> 200 (unused)
-#RUN usermod -u 200 www-data
-#RUN groupmod -g 200 www-data
-## user id 1000 -> 33
-#RUN usermod -u 33 jovyan
-#RUN find /home /var /tmp -user 1000 -exec chown 33.100 {} \;
-#RUN find /home /var /tmp -user 33 -exec chown 200.200 {} \;
-##RUN ls -ld /home
-##USER jovyan
-
+#USER jovyan
 
 COPY ./healthcheck_notebook.sh /bin/healthcheck.sh
 HEALTHCHECK --interval=30s --timeout=10s CMD /bin/healthcheck.sh
-
 # issue https://github.com/gher-uliege/DIVAnd-jupyterhub/issues/6
 # This should not be necessary anymore for julia 1.9
 # We are assuming the python is compiled with a newer libstdc++ than julia
 # (otherwise the file should not be removed)
 RUN ["/bin/sh","-c","rm /opt/julia-1.8.*/lib/julia/libstdc++.so.*"]
 
+WORKDIR /import
+
 CMD ["bash", "/usr/local/bin/run_galaxy.sh"]
 
 USER root
 RUN chmod 777 /home/jovyan/ -R
 USER jovyan
+
