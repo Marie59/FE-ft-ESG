@@ -1,6 +1,6 @@
 <tool id="interactive_tool_divand_notebook" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1">
     <requirements>
-        <container type="docker">docker.io/library/diva_test_2</container>
+        <container type="docker">quay.io/galaxy/divand-jupyterhub:galaxy-2023-04-25t0904-bag</container>
     </requirements>
     <entry_points>
         <entry_point name="DIVAnd Interactive Tool" requires_domain="True">
