@@ -1,4 +1,4 @@
-<tool id="interactive_tool_divand_notebook" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1">
+<tool id="interactive_tool_divand_notebook" tool_type="interactive" name="Interactive DIVAnd Notebooks" version="0.0.1" profile="22.05">
     <requirements>
         <container type="docker">quay.io/galaxy/divand-jupyterhub:galaxy-2023-04-25t0904-bag</container>
     </requirements>
