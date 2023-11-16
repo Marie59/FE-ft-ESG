@@ -1,0 +1,80 @@
+{
+    "summary": {
+        "num_errors": 0,
+        "num_failures": 0,
+        "num_skips": 0,
+        "num_tests": 1
+    },
+    "tests": [
+        {
+            "data": {
+                "inputs": {
+                    "dataset|data_dataset": "phy",
+                    "selection|cardinal_1": "-75.0",
+                    "selection|cardinal_2": "-45.0",
+                    "selection|cardinal_3": "20.0",
+                    "selection|cardinal_4": "30.0",
+                    "selection|data_selection": "space_time",
+                    "selection|date_1": "2011-01",
+                    "selection|date_2": "2011-06",
+                    "selection|pressure_1": "0.0",
+                    "selection|pressure_2": "10.0",
+                    "sources|data_sources": "erddap",
+                    "user": "standard"
+                },
+                "job": {
+                    "command_line": "python '/home/mjosse/Documents/fair_ease/4.BGC/argo/argo_getdata.py' 'standard' '-75.0' '-45.0' '20.0' '30.0' '0.0' '10.0' '2011-01' '2011-06' '' '' '' '' '' '/tmp/tmpmew75fo6/job_working_directory/000/1/outputs/dataset_4e10090e-7688-4a9e-9dc8-41083861143b.dat'",
+                    "command_version": "",
+                    "copied_from_job_id": null,
+                    "create_time": "2023-11-15T15:50:32.531926",
+                    "dependencies": [],
+                    "exit_code": 0,
+                    "external_id": "2660113",
+                    "galaxy_version": "23.1",
+                    "history_id": "2a2e1b2119354428",
+                    "id": "2a2e1b2119354428",
+                    "inputs": {},
+                    "job_messages": [],
+                    "job_metrics": [],
+                    "job_stderr": "",
+                    "job_stdout": "",
+                    "model_class": "Job",
+                    "output_collections": {},
+                    "outputs": {
+                        "output_argo": {
+                            "id": "2a2e1b2119354428",
+                            "src": "hda",
+                            "uuid": "4e10090e-7688-4a9e-9dc8-41083861143b"
+                        }
+                    },
+                    "params": {
+                        "__input_ext": "\"data\"",
+                        "chromInfo": "\"/tmp/tmpmew75fo6/galaxy-dev/tool-data/shared/ucsc/chrom/?.len\"",
+                        "dataset": "{\"__current_case__\": 0, \"data_dataset\": \"phy\"}",
+                        "dbkey": "\"?\"",
+                        "selection": "{\"__current_case__\": 0, \"cardinal_1\": \"-75.0\", \"cardinal_2\": \"-45.0\", \"cardinal_3\": \"20.0\", \"cardinal_4\": \"30.0\", \"data_selection\": \"space_time\", \"date_1\": \"2011-01\", \"date_2\": \"2011-06\", \"pressure_1\": \"0.0\", \"pressure_2\": \"10.0\"}",
+                        "sources": "{\"__current_case__\": 0, \"data_sources\": \"erddap\"}",
+                        "user": "\"standard\""
+                    },
+                    "state": "ok",
+                    "stderr": "",
+                    "stdout": "src argovis is: ok | src erddap is: ok | src gdac is: ok\n<xarray.Dataset>\nDimensions:          (N_POINTS: 998)\nCoordinates:\n  * N_POINTS         (N_POINTS) int64 0 1 2 3 4 5 6 ... 992 993 994 995 996 997\n    LATITUDE         (N_POINTS) float64 24.54 24.54 25.04 ... 26.67 24.96 24.96\n    LONGITUDE        (N_POINTS) float64 -45.14 -45.14 -51.58 ... -50.4 -50.4\n    TIME             (N_POINTS) datetime64[ns] 2011-01-01T11:49:19 ... 2011-0...\nData variables: (12/15)\n    CYCLE_NUMBER     (N_POINTS) int64 23 23 10 10 10 10 10 ... 1 5 2 10 10 38 38\n    DATA_MODE        (N_POINTS) <U1 'D' 'D' 'D' 'D' 'D' ... 'D' 'D' 'D' 'D' 'D'\n    DIRECTION        (N_POINTS) <U1 'A' 'A' 'A' 'A' 'A' ... 'A' 'A' 'A' 'A' 'A'\n    PLATFORM_NUMBER  (N_POINTS) int64 1901463 1901463 ... 1901463 1901463\n    POSITION_QC      (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    PRES             (N_POINTS) float32 5.0 10.0 2.0 4.0 ... 5.12 9.42 5.0 10.0\n    ...               ...\n    PSAL_ERROR       (N_POINTS) float32 0.01 0.01 0.01 ... 0.01 0.01091 0.01182\n    PSAL_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    TEMP             (N_POINTS) float32 24.08 24.08 24.03 ... 25.64 25.1 24.79\n    TEMP_ERROR       (N_POINTS) float32 0.002 0.002 0.002 ... 0.0025 0.002 0.002\n    TEMP_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    TIME_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\nAttributes:\n    DATA_ID:              ARGO\n    DOI:                  http://doi.org/10.17882/42182\n    Fetched_from:         https://erddap.ifremer.fr/erddap\n    Fetched_by:           mjosse\n    Fetched_date:         2023/11/15\n    Fetched_constraints:  [x=-75.00/-45.00; y=20.00/30.00; z=0.0/10.0; t=2011...\n    Fetched_uri:          ['https://erddap.ifremer.fr/erddap/tabledap/ArgoFlo...\n    history:              Variables filtered according to DATA_MODE; Variable...\n",
+                    "tool_id": "argo_getdata",
+                    "tool_stderr": "",
+                    "tool_stdout": "src argovis is: ok | src erddap is: ok | src gdac is: ok\n<xarray.Dataset>\nDimensions:          (N_POINTS: 998)\nCoordinates:\n  * N_POINTS         (N_POINTS) int64 0 1 2 3 4 5 6 ... 992 993 994 995 996 997\n    LATITUDE         (N_POINTS) float64 24.54 24.54 25.04 ... 26.67 24.96 24.96\n    LONGITUDE        (N_POINTS) float64 -45.14 -45.14 -51.58 ... -50.4 -50.4\n    TIME             (N_POINTS) datetime64[ns] 2011-01-01T11:49:19 ... 2011-0...\nData variables: (12/15)\n    CYCLE_NUMBER     (N_POINTS) int64 23 23 10 10 10 10 10 ... 1 5 2 10 10 38 38\n    DATA_MODE        (N_POINTS) <U1 'D' 'D' 'D' 'D' 'D' ... 'D' 'D' 'D' 'D' 'D'\n    DIRECTION        (N_POINTS) <U1 'A' 'A' 'A' 'A' 'A' ... 'A' 'A' 'A' 'A' 'A'\n    PLATFORM_NUMBER  (N_POINTS) int64 1901463 1901463 ... 1901463 1901463\n    POSITION_QC      (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    PRES             (N_POINTS) float32 5.0 10.0 2.0 4.0 ... 5.12 9.42 5.0 10.0\n    ...               ...\n    PSAL_ERROR       (N_POINTS) float32 0.01 0.01 0.01 ... 0.01 0.01091 0.01182\n    PSAL_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    TEMP             (N_POINTS) float32 24.08 24.08 24.03 ... 25.64 25.1 24.79\n    TEMP_ERROR       (N_POINTS) float32 0.002 0.002 0.002 ... 0.0025 0.002 0.002\n    TEMP_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\n    TIME_QC          (N_POINTS) int64 1 1 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1 1\nAttributes:\n    DATA_ID:              ARGO\n    DOI:                  http://doi.org/10.17882/42182\n    Fetched_from:         https://erddap.ifremer.fr/erddap\n    Fetched_by:           mjosse\n    Fetched_date:         2023/11/15\n    Fetched_constraints:  [x=-75.00/-45.00; y=20.00/30.00; z=0.0/10.0; t=2011...\n    Fetched_uri:          ['https://erddap.ifremer.fr/erddap/tabledap/ArgoFlo...\n    history:              Variables filtered according to DATA_MODE; Variable...\n",
+                    "traceback": null,
+                    "update_time": "2023-11-15T15:50:53.019072",
+                    "user_email": "planemo@galaxyproject.org"
+                },
+                "status": "success",
+                "test_index": 0,
+                "time_seconds": 21.20082712173462,
+                "tool_id": "argo_getdata",
+                "tool_version": "0.0.1"
+            },
+            "has_data": true,
+            "id": "argo_getdata-0"
+        }
+    ],
+    "version": "0.1"
+}
