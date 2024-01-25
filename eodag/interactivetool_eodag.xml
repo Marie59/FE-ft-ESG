@@ -20,8 +20,8 @@
         export HOME=\$PWD &&
         mkdir -p ./galaxy/outputs &&
         chmod -R 777 ./ &&
-        cd ./galaxy/
-        /init ;
+        cd ./galaxy/ &&
+        /init
     ]]>
     </command>
     <outputs>
