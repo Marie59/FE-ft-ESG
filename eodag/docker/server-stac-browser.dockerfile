@@ -110,4 +110,4 @@ RUN chmod +x /eodag/run-stac-server.sh
 
 # Ecrire un nouveau fichier SH pour exécuter STAC et Browser
 CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
-ENTRYPOINT ["/eodag/run-stac-server.sh"]
+#ENTRYPOINT ["/eodag/run-stac-server.sh"]
