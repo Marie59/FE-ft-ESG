@@ -1,0 +1,201 @@
+# -*- coding: utf-8 -*-
+# Copyright 2018, CS GROUP - France, https://www.csgroup.eu/
+#
+# This file is part of EODAG project
+#     https://www.github.com/CS-SI/EODAG
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+peps:
+    priority: # Lower value means lower priority (Default: 1)
+    search:  # Search parameters configuration
+    download:
+        extract:  # whether to extract the downloaded products, only applies to archived products (true or false, Default: true).
+        outputs_prefix: # where to store downloaded products, as an absolute file path (Default: local temporary directory)
+        dl_url_params:  # additional parameters to pass over to the download url as an url parameter
+        delete_archive: # whether to delete the downloaded archives (true or false, Default: true).
+    auth:
+        credentials:
+            username:
+            password:
+theia:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    download:
+        extract:
+        outputs_prefix:
+        dl_url_params:
+    auth:
+        credentials:
+            ident:
+            pass:
+usgs:
+    priority: # Lower value means lower priority (Default: 0)
+    api:
+        extract:
+        outputs_prefix:
+        dl_url_params:
+        product_location_scheme:
+        credentials:
+            username:
+            password:
+aws_eos:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            apikey:
+            aws_access_key_id:
+            aws_secret_access_key:
+            aws_profile:
+    download:
+        outputs_prefix:
+creodias:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    download:
+        extract:
+        outputs_prefix:
+    auth:
+        credentials:
+            username:
+            password:
+            totp: # set totp dynamically, see https://eodag.readthedocs.io/en/latest/getting_started_guide/configure.html#authenticate-using-an-otp-one-time-password-two-factor-authentication
+onda:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    download:
+        extract:
+        outputs_prefix:
+    auth:
+        credentials:
+            username:
+            password:
+astraea_eod:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            aws_access_key_id:
+            aws_secret_access_key:
+            aws_profile:
+    download:
+        outputs_prefix:
+usgs_satapi_aws:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            aws_access_key_id:
+            aws_secret_access_key:
+            aws_profile:
+    download:
+        outputs_prefix:
+earth_search:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            aws_access_key_id:
+            aws_secret_access_key:
+            aws_profile:
+    download:
+        outputs_prefix:
+earth_search_cog:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    download:
+        outputs_prefix:
+earth_search_gcs:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            aws_access_key_id:
+            aws_secret_access_key:
+    download:
+        outputs_prefix:
+ecmwf:
+    priority: # Lower value means lower priority (Default: 0)
+    api:
+        outputs_prefix:
+        credentials:
+            username:
+            password:
+cop_ads:
+    priority: # Lower value means lower priority (Default: 0)
+    api:
+        outputs_prefix:
+        credentials:
+            username:
+            password:
+cop_cds:
+    priority: # Lower value means lower priority (Default: 0)
+    api:
+        outputs_prefix:
+        credentials:
+            username:
+            password:
+sara:
+    priority: # Lower value means lower priority (Default: 0)
+    search:  # Search parameters configuration
+    download:
+        extract:
+        outputs_prefix:
+        delete_archive:
+    auth:
+        credentials:
+            username:
+            password:
+meteoblue:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            apikey:
+    download:
+        outputs_prefix:
+cop_dataspace:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    download:
+        extract:
+        outputs_prefix:
+    auth:
+        credentials:
+            username:
+            password:
+planetary_computer:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            apikey:
+    download:
+        outputs_prefix:
+hydroweb_next:
+    priority: # Lower value means lower priority (Default: 0)
+    search:   # Search parameters configuration
+    auth:
+        credentials:
+            apikey:
+    download:
+        outputs_prefix:
+wekeo:
+    priority: # Lower value means lower priority (Default: 0)
+    search:
+    download:
+        outputs_prefix:
+    auth:
+        credentials:
+            username:
+            password:

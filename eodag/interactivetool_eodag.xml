@@ -1,0 +1,49 @@
+<tool id="interactive_tool_eodag" tool_type="interactive" name="EODAG" version="@VERSION@">
+    <description>for searching, aggregating and downloading remote sensed images</description>
+    <macros>
+    <token name="@VERSION@">2.11.0</token>
+    </macros>
+    <requirements>
+        <container type="docker">docker.io/library/eodag:nginx</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="EODAG" requires_domain="True">
+            <port>5001</port>
+            <port>80</port>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="EODAG_CORS_ALLOWED_ORIGINS">http://127.0.0.1:5001</environment_variable>
+    </environment_variables>
+    <command detect_errors="exit_code">
+    <!-- see: https://odv.awi.de/fileadmin/user_upload/odv/misc/odvGuide.pdf -->
+    <![CDATA[
+        export HOME=\$PWD &&
+        mkdir -p ./galaxy/outputs &&
+        chmod -R 777 ./ &&
+        cd ./galaxy/
+        /init ;
+    ]]>
+    </command>
+    <outputs>
+        <data name="version" format="txt" label="${tool.name} on ${on_string}: version.txt" from_work_dir="version.txt" />
+        <collection name="outputs" type="list" label="EODAG outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="./output" visible="true"/>
+        </collection>
+    </outputs>
+    <tests>
+    </tests>
+    <help><![CDATA[
+        EODAG [Earth Observation Data Access Gateway](https://eodag.readthedocs.io/en/latest/index.html) is a command line tool and a plugin-oriented Python framework for searching, aggregating results and downloading remote sensed images while offering a unified API for data access regardless of the data provider.
+    ]]>
+    </help>
+    <citations>
+        <citation type="bibtex">
+            @Manual{,
+            title = {EODAG},
+            author = {CS GROUP - France},
+            year = {2024},
+            note = {https://github.com/CS-SI/eodag/tree/develop}
+        </citation>
+    </citations>
+</tool>

@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+# Copyright 2018, CS GROUP - France, https://www.csgroup.eu/
+#
+# This file is part of EODAG project
+#     https://www.github.com/CS-SI/EODAG
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+search:
+  type: StacSearch
+  results_entry: features
+  pagination:
+    next_page_query_obj: '{{"limit":{items_per_page},"page":{page}}}'
+    total_items_nb_key_path: '$.numberMatched'
+    next_page_url_key_path: '$.links[?(@.rel="next")].href'
+    next_page_query_obj_key_path: '$.links[?(@.rel="next")].body'
+    next_page_merge_key_path: '$.links[?(@.rel="next")].merge'
+  discover_metadata:
+    auto_discovery: true
+    metadata_pattern: '^[a-zA-Z0-9_:-]+$'
+    search_param: '{{{{"query":{{{{"{metadata}":{{{{"eq":"{{{metadata}}}" }}}} }}}} }}}}'
+    metadata_path: '$.properties.*'
+  discover_product_types:
+    fetch_url: '{api_endpoint}/../collections'
+    result_type: json
+    results_entry: '$.collections[*]'
+    generic_product_type_id: '$.id'
+    generic_product_type_parsable_properties:
+      productType: '$.id'
+    generic_product_type_parsable_metadata:
+      abstract: '$.description'
+      instrument: '{$.summaries.instruments#csv_list}'
+      platform: '{$.summaries.constellation#csv_list}'
+      platformSerialIdentifier: '{$.summaries.platform#csv_list}'
+      processingLevel: '$.summaries."processing:level"'
+      keywords: '{$.keywords#csv_list}'
+      license: '$.license'
+      title: '$.title'
+      missionStartDate: '$.extent.temporal.interval[0][0]'
+    metadata_path: '$.properties.*'
+  discover_queryables:
+    fetch_url: '{api_endpoint}/../queryables'
+    product_type_fetch_url: '{api_endpoint}/../collections/{provider_product_type}/queryables'
+    result_type: json
+    results_entry: '$.properties[*]'
+    queryable_parsable_metadata:
+      description: '$.description'
+      title: '$.title'
+      type: '$.type'
+      pattern: '$.pattern'
+  common_metadata_mapping_path: '$'
+  metadata_mapping:
+    # OpenSearch Parameters for Collection Search (Table 3)
+    productType:
+      - '{{"collections":["{productType}"]}}'
+      - '$.collection'
+    doi:
+      - '{{"query":{{"sci:doi":{{"eq":"{doi}"}}}}}}'
+      - '$.properties."sci:doi"'
+    processingLevel:
+      - '{{"query":{{"processing:level":{{"eq":"{processingLevel}"}}}}}}'
+      - '$.properties."processing:level"'
+    platform:
+      - '{{"query":{{"constellation":{{"eq":"{platform}"}}}}}}'
+      - '$.properties.constellation'
+    platformSerialIdentifier:
+      - '{{"query":{{"platform":{{"eq":"{platformSerialIdentifier}"}}}}}}'
+      - '$.properties.platform'
+    instrument:
+    # to test
+      - '{{"query":{{"instruments":{{"eq":"{instrument}"}}}}}}'
+      - '$.properties.instruments'
+    # INSPIRE obligated OpenSearch Parameters for Collection Search (Table 4)
+    title: '$.id'
+    abstract: '$.properties.description'
+    resolution:
+      - '{{"query":{{"gsd":{{"eq":"{resolution}"}}}}}}'
+      - '$.properties.gsd'
+    publicationDate:
+      - '{{"query":{{"published":{{"eq":"{publicationDate}"}}}}}}'
+      - '$.properties.published'
+    # OpenSearch Parameters for Product Search (Table 5)
+    orbitNumber:
+      - '{{"query":{{"sat:relative_orbit":{{"eq":"{orbitNumber}"}}}}}}'
+      - '$.properties."sat:relative_orbit"'
+    orbitDirection:
+      - '{{"query":{{"sat:orbit_state":{{"eq":"{orbitDirection}"}}}}}}'
+      - '$.properties."sat:orbit_state"'
+    cloudCover:
+      - '{{"query":{{"eo:cloud_cover":{{"lte":"{cloudCover}"}}}}}}'
+      - '$.properties."eo:cloud_cover"'
+    sensorMode:
+      - '{{"query":{{"sar:instrument_mode":{{"eq":"{sensorMode}"}}}}}}'
+      - '$.properties."sar:instrument_mode"'
+    creationDate:
+      - '{{"query":{{"created":{{"eq":"{creationDate}"}}}}}}'
+      - '$.properties.created'
+    modificationDate:
+      - '{{"query":{{"updated":{{"eq":"{modificationDate}"}}}}}}'
+      - '$.properties.updated'
+    productVersion:
+      - '{{"query":{{"version":{{"eq":"{productVersion}"}}}}}}'
+      - '$.properties.version'
+    # OpenSearch Parameters for Acquistion Parameters Search (Table 6)
+    availabilityTime:
+      - '{{"query":{{"availabilityTime":{{"eq":"{availabilityTime}"}}}}}}'
+      - '$.properties.availabilityTime'
+    acquisitionStation:
+      - '{{"query":{{"acquisitionStation":{{"eq":"{acquisitionStation}"}}}}}}'
+      - '$.properties.acquisitionStation'
+    acquisitionSubType:
+      - '{{"query":{{"acquisitionSubType":{{"eq":"{acquisitionSubType}"}}}}}}'
+      - '$.properties.acquisitionSubType'
+    startTimeFromAscendingNode: '$.properties.datetime'
+    completionTimeFromAscendingNode:
+      - '{{"datetime":"{startTimeFromAscendingNode#to_iso_utc_datetime}/{completionTimeFromAscendingNode#to_iso_utc_datetime}"}}'
+      - '$.properties.end_datetime'
+    illuminationAzimuthAngle:
+      - '{{"query":{{"view:sun_azimuth":{{"eq":"{illuminationAzimuthAngle}"}}}}}}'
+      - '$.properties."view:sun_azimuth"'
+    illuminationElevationAngle:
+      - '{{"query":{{"view:sun_elevation":{{"eq":"{illuminationElevationAngle}"}}}}}}'
+      - '$.properties."view:sun_elevation"'
+    polarizationChannels:
+      - '{{"query":{{"sar:polarizations":{{"eq":"{polarizationChannels}"}}}}}}'
+      - '$.properties."sar:polarizations"'
+    dopplerFrequency:
+      - '{{"query":{{"sar:frequency_band":{{"eq":"{dopplerFrequency}"}}}}}}'
+      - '$.properties."sar:frequency_band"'
+    # Custom parameters (not defined in the base document referenced above)
+    id:
+      - '{{"ids":["{id}"]}}'
+      - '$.id'
+    geometry:
+      - '{{"intersects":{geometry#to_geojson}}}'
+      - '($.geometry.`str()`.`sub(/^None$/, POLYGON((180 -90, 180 90, -180 90, -180 -90, 180 -90)))`)|($.geometry[*])'
+    downloadLink: '$.links[?(@.rel="self")].href'
+    quicklook: '$.assets.quicklook.href'
+    thumbnail: '$.assets.thumbnail.href'
+    # storageStatus set to ONLINE for consistency between providers
+    storageStatus: '{$.null#replace_str("Not Available","ONLINE")}'
+    # Normalization code moves assets from properties to product's attr
+    assets: '$.assets'
