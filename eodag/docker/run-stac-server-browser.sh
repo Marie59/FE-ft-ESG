@@ -8,5 +8,5 @@ else
     echo "Logging level can be changed using EODAG_LOGGING environment variable [1-3]"
 fi
 # start
- exec "$@" &
+ exec /usr/sbin/nginx -g "daemon off;" & 
  exec eodag $LOGGING_OPTIONS serve-rest -w
