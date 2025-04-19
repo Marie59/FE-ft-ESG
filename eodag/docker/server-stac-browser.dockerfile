@@ -9,7 +9,8 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y git
 
 #clone repository
-RUN git clone https://github.com/radiantearth/stac-browser.git
+#RUN git clone https://github.com/radiantearth/stac-browser.git
+COPY ./stac-browser /stac-browser
 
 # move to folder
 WORKDIR /stac-browser
@@ -18,7 +19,7 @@ WORKDIR /stac-browser
 RUN npm install
 
 # start application
-RUN npm run build -- --catalogUrl=http://localhost:5000
+RUN npm run build
 
 ##########################
 #        BROWSER          #
@@ -103,11 +104,12 @@ COPY --from=build-stac /stac-browser/dist /usr/share/nginx/html
 COPY ./docker/run-stac-server-browser.sh /eodag/run-stac-server.sh
 
 # and make executable
-RUN chmod +x /eodag/run-stac-server.sh
+RUN chmod +x /eodag/run-stac-server.sh && \
+    apt update && apt install -y htop
 
 # switch to non-root user
 #USER user
 
 # Ecrire un nouveau fichier SH pour exécuter STAC et Browser
-CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+#CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
 #ENTRYPOINT ["/eodag/run-stac-server.sh"]

@@ -21,7 +21,7 @@
         mkdir -p ./galaxy/outputs &&
         chmod -R 777 ./ &&
         cd ./galaxy/ &&
-        /init
+        /eodag/run-stac-server.sh
     ]]>
     </command>
     <outputs>
